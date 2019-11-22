@@ -12,9 +12,7 @@ void readFirst(char* name, unsigned long *nnodes,unsigned long *nways){
   
   char *buffer=NULL;
   size_t bufsize =0;
-  char *n="n";
-  char *w="w";
-  int catch=0;  
+  char *r="r";
   char* delim="|";
 
   if ((fin = fopen (name, "r")) == NULL)
@@ -24,28 +22,25 @@ void readFirst(char* name, unsigned long *nnodes,unsigned long *nways){
     if(getline(&buffer,&bufsize,fin)==-1)
       ExitError("when reading header", 12);
   }
-  while(getline(&buffer,&bufsize,fin)){
-    if(buffer[0]==n[0]) (*nnodes)++;
-    else if (buffer[0]==w[0]) (*nways)++;
-    else {
-      catch=1;
-      printf("Read succesful, relations reached\n");
-      break;
-    }
-  }
-  if(!catch){
-   ExitError("when reading csv\n",2);
+  if(getline(&buffer,&bufsize,fin)==-1)
+    ExitError("reading line",2);
+  while(buffer[0]!=r[0]){
+    (*nnodes)+=(buffer[0]+1)%2;
+    (*nways)+=(buffer[0]%2);
+    if(getline(&buffer,&bufsize,fin)==-1)
+      ExitError("reading line",3);
   }
   printf("First lecture finished\n");    
   
   fclose(fin);
+  free(buffer);buffer=NULL;
 }
 
 //get line, tokenizer, ignora el 1, el segundo campo al id como lu,
 //el tercero a name si no esta vacío, Campo 10 lat campo 11 lon
 
 
-void readNodes( char* name,node **nodes, unsigned long nnodes){
+void readNodes( char* name,node **nodes, unsigned long nnodes,unsigned long nways){
   FILE *fin;
   
   char *buffer=NULL;
@@ -63,27 +58,39 @@ void readNodes( char* name,node **nodes, unsigned long nnodes){
       ExitError("when reading file", 2);
   }
  int j;
+ char *token;
+ char*line2;
+
  for (i=0;i<nnodes;i++){
    if(getline(&buffer,&bufsize,fin)==-1)
       ExitError("when reading file", 2);
-   strsep(&buffer,delim);
-   (*nodes)[i].id=strtoul(buffer,&ptr,10);
-   strsep(&buffer,delim);
-   if(buffer[0]==delim[0])
+   line2=buffer;
+
+   strsep(&line2,delim);  
+   token=strsep(&line2,delim);
+   (*nodes)[i].id=strtoul(token,&ptr,10);
+    token=strsep(&line2,delim);
+   if(strlen(token)==0)
      (*nodes)[i].name=NULL;
    else{
-     printf("done node %lu\n",i);
-     printf("%s\n",buffer);
-     char *ab;
-     strcpy(ab,buffer);
-     printf("si copio\n");
-     printf("%s\n",ab);
+     (*nodes)[i].name=(char*)malloc(strlen(token)+1);
+     strcpy((*nodes)[i].name,token);
    }
-   for (j=4;j<=10;j++) strsep(&buffer,delim);
-   (*nodes)[i].lat=strtoul(buffer,&ptr,10);
-   (*nodes)[i].lon=strtoul(strsep(&buffer,delim),&ptr,10);
-   
- }  
+   for (j=4;j<10;j++) strsep(&line2,delim);
+     (*nodes)[i].lat=strtod(line2,NULL);
+     strsep(&line2,delim);
+     (*nodes)[i].lon=strtod(line2,NULL);   
+ }
+ 
+//  for (i=nnodes;i<nways;i++){
+//    
+//    
+//    
+//    
+//  }
  fclose(fin);
+ free(buffer);
+ buffer=NULL;
+ printf("read\n");
 }
 

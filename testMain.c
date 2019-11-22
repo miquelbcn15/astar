@@ -10,7 +10,7 @@ int main(){
   printf("nnodes %lu\n",nnodes);
   printf("nways %lu\n",nways);
   node*nodes;
-  readNodes(name,&nodes,nnodes);
-  printf("id node 0:%lu",nodes[0].id);
+  readNodes(name,&nodes,nnodes,nways);
+  
  return 0; 
 }
