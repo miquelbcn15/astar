@@ -23,6 +23,7 @@ void writeBin(char *file, node *nodes, unsigned long nnodes) {
     if ( fwrite(&nnodes, sizeof(unsigned long), 1, fin) +
          fwrite(&ntotnsucc, sizeof(unsigned long), 1, fin) != 2 )
         ExitError("when initializing the output binary data file", 32);
+    fprintf(stderr, "nnodes : %lu\nallsucc : %lu\n", nnodes, ntotnsucc);
 
     /* Writing all nodes */
     if ( fwrite(nodes, sizeof(nodes), nnodes, fin) != nnodes) 
@@ -41,35 +42,43 @@ void writeBin(char *file, node *nodes, unsigned long nnodes) {
 
 /*------------------------------------------------------------*/
 
-void readBin(char *argv[], FILE **fin, node **nodes,
+void readBin(char *name, node **nodes,
         unsigned long **allsuccessors, unsigned long *nnodes,
         unsigned long *ntotnsucc) {
+    /* Reads the binary file */
+    fprintf(stderr, "readBin(): init\n");
+    FILE *fin;
 
-    if ((*fin = fopen (argv[1], "r")) == NULL) 
+    if ((fin = fopen (name, "r")) == NULL) 
         ExitError("the data file does not exist or cannot be opened", 11);
 
     /* Global data --- header */
-    if (fread(nnodes, sizeof(unsigned long), 1, *fin) +\
-        fread(ntotnsucc, sizeof(unsigned long), 1, *fin) != 2 )
+    if (fread(nnodes, sizeof(unsigned long), 1, fin) +\
+        fread(ntotnsucc, sizeof(unsigned long), 1, fin) != 2 )
         ExitError("when reading the header of the binary data file", 12);
 
     /* Getting memory for all data */
-    if (( *nodes = (node*) malloc((*nnodes) * sizeof(node))) == NULL ) 
+    if (( (*nodes) = (node*)malloc((*nnodes) * sizeof(node))) == NULL ) 
         ExitError("when allocating memory for the nodes vector", 13);
-    if (( *allsuccessors = (unsigned long*) malloc((*ntotnsucc) *
-                    sizeof(unsigned long))) == NULL)
+    if (( (*allsuccessors) = (unsigned long*)malloc((*ntotnsucc) * sizeof(unsigned long))) == NULL)
         ExitError("when allocating memory for the edges vector", 15);
+    
+    fprintf(stderr, "nnodes : %lu\nallsucc : %lu\n", *nnodes, *ntotnsucc);
 
     /* Reading all data from file */
-    if ( fread(*nodes, sizeof(node), *nnodes, *fin) != *nnodes )
+    if ( fread((*nodes), sizeof(node), (*nnodes), fin) != (*nnodes) )
         ExitError("when reading nodes from the binary data file", 17);
-    if ( fread(*allsuccessors, sizeof(unsigned long), *ntotnsucc, *fin) != *ntotnsucc )
+    if ( fread((*allsuccessors), sizeof(unsigned long), (*ntotnsucc), fin) !=
+            (*ntotnsucc) )
         ExitError("when reading successors from the binary data file", 18);
-    fclose(*fin);
+
+    fclose(fin);
 
     /* Setting pointers to successors */
     for (int i = 0; i < *nnodes; i++) if((*nodes[i]).nsucc) {
         (*nodes)[i].successors = *allsuccessors; *allsuccessors +=
             (*nodes)[i].nsucc;
     }
+
+    fprintf(stderr, "readBin(): end\n");
 }

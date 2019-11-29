@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
-#include "auxFun.h"
+#include <stdio.h>
+#include "writebin.h"
 
 void readFirst(char *name, unsigned long *nnodes, unsigned long *nways) {
     /* returns the number of nodes and number of ways for the file 'name' */
@@ -42,7 +43,7 @@ void readFirst(char *name, unsigned long *nnodes, unsigned long *nways) {
         }
     }
 
-    printf(stderr, "readFirst(): first lecture finished\n");    
+    fprintf(stderr, "readFirst(): first lecture finished\n");    
 
     fclose(fin);
     free(buffer); buffer=NULL;
