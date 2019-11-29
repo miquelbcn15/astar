@@ -4,7 +4,8 @@
 
 void readFirst(char *name, unsigned long *nnodes, unsigned long *nways) {
     /* returns the number of nodes and number of ways for the file 'name' */
-    
+    fprintf(stderr, "readFirst(): init\n");
+
     /* Initializing just in case */
     (*nnodes) = 0; (*nways) = 0;     
     FILE *fin;
@@ -41,7 +42,7 @@ void readFirst(char *name, unsigned long *nnodes, unsigned long *nways) {
         }
     }
 
-    printf("readFirst(): First lecture finished\n");    
+    printf(stderr, "readFirst(): first lecture finished\n");    
 
     fclose(fin);
     free(buffer); buffer=NULL;
@@ -87,6 +88,8 @@ void createEdge(node **nodes, unsigned long node1, unsigned long node2,
 /*-----------------------------------------------------------------*/
 
 void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nways) {
+    fprintf(stderr, "readNodes(): init\n");
+
     FILE *fin;
 
     char   *buffer = NULL;
@@ -150,10 +153,10 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
         (*nodes)[i].lon=strtod(line2, NULL);   
     }
 
-    printf("readNodes(): filled nodes\n");
+    fprintf(stderr, "readNodes(): filled nodes\n");
 
     int oneway;
-    unsigned long node1, node2;
+    long node1, node2;
     
     /* Allocate memory for additional sucessors */
     if ( (nsuccdim = (int*)calloc(nnodes, sizeof(int))) == NULL) {
@@ -208,5 +211,5 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
     free(buffer);
     buffer = NULL;
 
-    printf("readNodes(): read\n");
+    fprintf(stderr, "readNodes(): read\n");
 }

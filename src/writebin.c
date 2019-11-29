@@ -5,6 +5,7 @@
 
 void writeBin(char *file, node *nodes, unsigned long nnodes) {
     /* Write the binary file to name.bin */
+    fprintf(stderr, "writeBin(): init\n");
 
     unsigned long ntotnsucc = 0UL;
     char name[257];
@@ -35,6 +36,7 @@ void writeBin(char *file, node *nodes, unsigned long nnodes) {
     }
     
     fclose(fin);
+    fprintf(stderr, "writeBin(): finished\n");
 }
 
 /*------------------------------------------------------------*/
