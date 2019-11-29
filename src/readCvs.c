@@ -50,17 +50,14 @@ void readFirst(char *name, unsigned long *nnodes, unsigned long *nways) {
 /*----------------------------------------------------------------*/
 
 long binarySearch(node *nodes, unsigned long key, unsigned long nnodes) {
-    register unsigned long start = 0UL, afterend = nnodes, middle;
+    register unsigned long start = 0UL, middle, afterend = nnodes;
     register unsigned long try;
-    middle = start + ((afterend - start - 1) >> 1);
     while (afterend > start) {
+        middle = start + ((afterend - start - 1) >> 1);
         try = nodes[middle].id;
         if (key == try) return middle;
         else if (key > try) start = middle + 1;
-        else { 
-            afterend = middle;
-            middle = start + ((afterend - start - 1) >> 1);
-        }
+        else   afterend = middle;
 
     }
     return -1;
