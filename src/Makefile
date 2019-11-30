@@ -23,6 +23,6 @@ readCsv.o : readCsv.c readCsv.h auxFun.o
 # Neteja
 clean : 
 	rm -f *.o
-reaclean : clean
+realclean : clean
 	rm -f write read
 
