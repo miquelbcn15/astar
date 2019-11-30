@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "readCvs.h"
+#include "readCsv.h"
 #include "writebin.h"
 #include "auxFun.h"
 

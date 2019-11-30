@@ -49,7 +49,7 @@ void readBin(char *name, node **nodes,
     fprintf(stderr, "readBin(): init\n");
     FILE *fin;
 
-    if ((fin = fopen (name, "r")) == NULL) 
+    if ((fin = fopen (name, "rb")) == NULL) 
         ExitError("the data file does not exist or cannot be opened", 11);
 
     /* Global data --- header */
@@ -66,7 +66,11 @@ void readBin(char *name, node **nodes,
     fprintf(stderr, "nnodes : %lu\nallsucc : %lu\n", *nnodes, *ntotnsucc);
 
     /* Reading all data from file */
-    if ( fread((*nodes), sizeof(node), (*nnodes), fin) != (*nnodes) )
+    unsigned long nodesread = fread((*nodes), sizeof(node), (*nnodes), fin);
+    if ( nodesread != (*nnodes) )
+        fprintf(stderr, "nodes read : %lu\n", nodesread);
+        fprintf(stderr, "node 0. Nsucc: %d  \n", (*nodes)[0].nsucc);
+        fprintf(stderr, "node 1. Nsucc : %d \n", (*nodes)[1].nsucc);
         ExitError("when reading nodes from the binary data file", 17);
     if ( fread((*allsuccessors), sizeof(unsigned long), (*ntotnsucc), fin) !=
             (*ntotnsucc) )
