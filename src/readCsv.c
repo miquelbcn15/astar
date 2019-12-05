@@ -131,6 +131,10 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
 
         /* This has to be done somewhere, and here is recorring nodes anyway */
         (*nodes)[i].nsucc = 0;
+        /* Trying to allocate memory before reallocating ... */
+        /* if ( ((*nodes)[i].successors = malloc(2 * sizeof(unsigned long))) == NULL) { */
+        /*     ExitError("allocating memory for successors", 13); */
+        /* } */
 
         /* Skip line type */
         strsep(&line2, delim);
