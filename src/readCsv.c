@@ -144,10 +144,10 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
         /* Save the name */
         token = strsep(&line2, delim);
         if(strlen(token) == 0) {
-            (*nodes)[i].name = NULL;
+            //(*nodes)[i].name = NULL; //EN VEZ DE NULL, NO TOCAR
         } 
         else {
-            (*nodes)[i].name = (char*)malloc(strlen(token)+1);
+            //(*nodes)[i].name = (char*)malloc(strlen(token)+1);  //OJO NO RESERVO MEMORIA NOMBRES
             strcpy((*nodes)[i].name, token); //token does not have the null terminator (i think) but strcpy adds one, so reserve space for it
         }
         /* Skip useless information */

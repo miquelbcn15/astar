@@ -41,17 +41,14 @@ int main(int argc, char *argv[]){
     printf("FIRST name: %s \n", nodes[644].name); //should print La Roca. For control.
     printf("last node. Nsucc: %d \n", nodes[nnodes-1].nsucc);
     
-   //writeBin(NOMF, nodes, nnodes);
+   writeBin(NOMF, nodes, nnodes);
     unsigned long i;
 for (i=0;i<nnodes;i++){
   if(nodes[i].nsucc>0){
       free(nodes[i].successors);
       nodes[i].successors=NULL;
   }
-  if(nodes[i].name!=NULL){
-      free(nodes[i].name); 
-      nodes[i].name=NULL;
-  }
+
 }    
 free(nodes);
 nodes=NULL;
