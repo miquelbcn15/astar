@@ -12,6 +12,11 @@
     ./test cataluna.csv
  */
 
+/*USEFUL SHIT:
+ * cut -d '|' -f3 cataluna.csv | awk '{if($0) print($0)}' |head      GIVES ALL NAMES IN ORDER
+ *  cut -d '|' -f3 cataluna.csv | grep -n 'La Roca'      GIVES THE LINE NUMBER OF FIRST NAME, WHICH IS LA ROCA (648)
+*/
+
 int main(int argc, char *argv[]){
 
     unsigned long nnodes = 0;
@@ -33,12 +38,11 @@ int main(int argc, char *argv[]){
 
     readNodes(NOMF, &nodes, nnodes, nways);
     printf("node 0. Nsucc: %d , succ %lu\n", nodes[0].nsucc, nodes[0].successors[0]);
-    printf("node 1. Nsucc: %d , succ %lu\n", nodes[1].nsucc, nodes[1].successors[0]);
+    printf("FIRST name: %s \n", nodes[644].name); //should print La Roca. For control.
+    printf("last node. Nsucc: %d \n", nodes[nnodes-1].nsucc);
     
-  //  writeBin(NOMF, nodes, nnodes);
-
-/* cleaning: eliminates flags from valgrind so we can see actual problems*/
-int i;
+   //writeBin(NOMF, nodes, nnodes);
+    unsigned long i;
 for (i=0;i<nnodes;i++){
   if(nodes[i].nsucc>0){
       free(nodes[i].successors);
@@ -50,5 +54,14 @@ for (i=0;i<nnodes;i++){
   }
 }    
 free(nodes);
+nodes=NULL;
+   unsigned long *allsuccessors;
+   unsigned long numnodos, numtotnsucc;
+   readBin("cataluna.bin", &nodes, &allsuccessors, &numnodos, &numtotnsucc);
+    printf("node 0. Nsucc: %d , succ %lu\n", nodes[0].nsucc, nodes[0].successors[0]);
+    printf("FIRST name: %s \n", nodes[644].name); //should print La Roca. For control.
+    printf("last node. Nsucc: %d \n", nodes[nnodes-1].nsucc);
+/* cleaning: eliminates flags from valgrind so we can see actual problems*/
+
     return 0; 
 }
