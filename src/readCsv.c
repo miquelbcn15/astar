@@ -60,7 +60,6 @@ long binarySearch(node *nodes, unsigned long key, unsigned long nnodes) {
         if (key == try) return middle;
         else if (key > try) start = middle + 1;
         else   afterend = middle;
-
     }
     return -1;
 }
@@ -72,7 +71,7 @@ void createEdge(node **nodes, unsigned long node1, unsigned long node2,
     unsigned long s, g;
     int i;
     s = node1; g = node2;
-    /* Do it once if oneway, twice interchanging nodes ig go and back  */
+    /* Do it once if oneway, twice interchanging nodes id go and back  */
     for (i = 0; i < (oneway+1); i++) { 
         (*nodes)[s].nsucc++;
         if (nsuccdim[s] < (*nodes)[s].nsucc) { 
@@ -131,6 +130,7 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
 
         /* This has to be done somewhere, and here is recorring nodes anyway */
         (*nodes)[i].nsucc = 0;
+	(*nodes)[i].successors=NULL;
         /* Trying to allocate memory before reallocating ... */
         /* if ( ((*nodes)[i].successors = malloc(2 * sizeof(unsigned long))) == NULL) { */
         /*     ExitError("allocating memory for successors", 13); */
@@ -147,8 +147,8 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
             (*nodes)[i].name = NULL;
         } 
         else {
-            (*nodes)[i].name = (char*)malloc(strlen(token) + 1);
-            strcpy((*nodes)[i].name, token);
+            (*nodes)[i].name = (char*)malloc(strlen(token)+1);
+            strcpy((*nodes)[i].name, token); //token does not have the null terminator (i think) but strcpy adds one, so reserve space for it
         }
         /* Skip useless information */
         for (j = 4; j < 10; j++) strsep(&line2, delim);
@@ -166,7 +166,7 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
     /* Allocate memory for additional sucessors */
     if ( (nsuccdim = (int*)calloc(nnodes, sizeof(int))) == NULL) {
         ExitError("allocating memory for nsuccdim", 13);
-    }
+    } /*we need it initialized to 0, and calloc is faster than malloc+memset*\
 
     /* Read ways */
     for (i = 0; i < nways; i++) {
@@ -183,7 +183,7 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
         
         /* Type of way */
         token = strsep(&line2, delim);
-        if (strlen(token) > 0) oneway = 0; // something written=>oneway, so its true
+        if (strlen(token) > 0) oneway = 0; // something written=>oneway, so its false
         
         /* line2 points to field 10, first node */  
         strsep(&line2, delim);  
@@ -204,7 +204,7 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
             node2 = binarySearch(*nodes, strtoul(token, &ptr, 10), nnodes);
             if ( node2 + 1 ) {
                // >0 true. return -1=>false. 
-               // No existe el nodo, se coge otro para node2, si no hay se descarta way
+               // Node does not exist. Take another for node2. No node? Discard way
                createEdge(nodes, node1, node2, oneway, nsuccdim);
                node1 = node2;
             }
@@ -215,6 +215,7 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
     fclose(fin);
     free(buffer);
     buffer = NULL;
-
+    free(nsuccdim);
+    nsuccdim=NULL;
     fprintf(stderr, "readNodes(): read\n");
 }
