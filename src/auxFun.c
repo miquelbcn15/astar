@@ -20,3 +20,9 @@ long binarySearch(node *nodes, unsigned long key, unsigned long nnodes) {
     }
     return -1;
 }
+
+/*---------------------------------------------------------*/
+
+void clean(void ** v){
+ free(*v); v=NULL; 
+}

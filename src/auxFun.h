@@ -3,7 +3,7 @@
 
 typedef struct {
     unsigned long id;
-    char* name;; //was name[187]
+    char* name;
     double lat, lon;
     unsigned short nsucc;
     unsigned long *successors;
@@ -16,16 +16,18 @@ enum whichQueue {NONE, OPEN, CLOSED};
 typedef struct { 
     double g, h;
     unsigned long parent;
-    Queue whq;
+    Queue where;
 } AStarStatus;
 
 typedef struct List {
     double f;
     node *vertex;
     AStarStatus *status;
-    List *next;
+    struct List *next;
 } list;
 
+#define infinity 1e6 //we need something bigger than the biggest value
+
 void ExitError(char*, int); 
-unsigned long binarySearch(node*, unsigned long, unsigned long);
+long binarySearch(node*, unsigned long, unsigned long);
 #endif /* _AUXFUN_H */

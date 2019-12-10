@@ -54,7 +54,7 @@ void readBin(char *name, node **nodes,
         unsigned long **allsuccessors, unsigned long *nnodes,
         unsigned long *ntotnsucc) {
     unsigned long i; 
-    int *nameslen;
+    int *nameslen, len;
     /* Reads the binary file */
     fprintf(stderr, "readBin(): init\n");
     FILE *fin;
@@ -87,11 +87,15 @@ void readBin(char *name, node **nodes,
     if( fread(nameslen,sizeof(int),(*nnodes),fin)!=(*nnodes))
         ExitError("when reading lenth of names", 19);
     for(i=0;i<(*nnodes);i++) {
-	if(nameslen[i]){
-	    if(((*nodes)[i].name=(char*)malloc(nameslen[i]+1))==NULL) ExitError("reserving a name",22);
-	    if (fread((*nodes)[i].name,sizeof(char),nameslen[i],fin)!=nameslen[i]) ExitError("reading names",23);
-	    strcat((*nodes)[i].name,"\0");
-	}
+      len=nameslen[i]; /*No need to access the vector a thousand times in the loop*/
+	if(len){
+	    if(((*nodes)[i].name=(char*)malloc(len+1))==NULL) ExitError("when reserving memory for a name",22);
+	    ((*nodes)[i].name)[len]='\0';
+	    if (fread((*nodes)[i].name,sizeof(char),len,fin)!=len) ExitError("when reading a name",23);
+	} /*READ THIS: Valgrind doesn't like passing to fread an unitialized pointer although it's writing in it, not reading.
+	A solution is to put any value in the array. As the \0 is needed anyway, I put it at the end before fread.
+	Valgrind shuts up and everything works fine*/
+	else (*nodes)[i].name=NULL; /*READ:this null is to be sure, and will be useful reconstructing the final path*/
      }
 
     fclose(fin);
@@ -103,6 +107,6 @@ void readBin(char *name, node **nodes,
 	*allsuccessors += (*nodes)[i].nsucc;
       }
     }
-   free(nameslen); nameslen=NULL;
+   clean(&nameslen);
     fprintf(stderr, "readBin(): end\n");
 }
