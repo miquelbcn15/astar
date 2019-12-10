@@ -3,7 +3,7 @@
 
 typedef struct {
     unsigned long id;
-    char name[187]; //was char*name;
+    char* name;; //was name[187]
     double lat, lon;
     unsigned short nsucc;
     unsigned long *successors;

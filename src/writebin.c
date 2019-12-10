@@ -10,7 +10,8 @@ void writeBin(char *file, node *nodes, unsigned long nnodes) {
     unsigned long ntotnsucc = 0UL;
     char name[257];
     FILE *fin;
-    unsigned long i; /*MI COMPILADOR NO PERMITE DECLARACIÓN DENTRO DEL FOR*/
+    unsigned long i; 
+    int len;
     /* Computing the total number of successors */
     for (i = 0; i < nnodes; i++) ntotnsucc += nodes[i].nsucc;
 
@@ -35,6 +36,13 @@ void writeBin(char *file, node *nodes, unsigned long nnodes) {
                     nodes[i].nsucc, fin) != nodes[i].nsucc ) 
             ExitError("when writing edges to the output binary data file", 32);
     }
+    for (i=0;i<nnodes;i++){ //i'm doing the loop twice-> one: store the lenth, two:store the names
+	if(nodes[i].name!=NULL) {len=strlen(nodes[i].name); if(fwrite(&len, sizeof(int), 1, fin) != 1) ExitError("writting len names",5);}
+        else {len=0; if(fwrite(&len, sizeof(int), 1, fin)!=1) ExitError("writting len names",5);}
+    }
+    for (i=0;i<nnodes;i++){ //this loop could use the lenth found before, but we would need to store them
+	if(nodes[i].name!=NULL) {len=strlen(nodes[i].name); if(fwrite(nodes[i].name, sizeof(char),len, fin) != len) ExitError("writting names",6);}
+    }    
     
     fclose(fin);
     fprintf(stderr, "writeBin(): finished\n");
@@ -45,7 +53,8 @@ void writeBin(char *file, node *nodes, unsigned long nnodes) {
 void readBin(char *name, node **nodes,
         unsigned long **allsuccessors, unsigned long *nnodes,
         unsigned long *ntotnsucc) {
-    unsigned long i;
+    unsigned long i; 
+    int *nameslen;
     /* Reads the binary file */
     fprintf(stderr, "readBin(): init\n");
     FILE *fin;
@@ -63,27 +72,37 @@ void readBin(char *name, node **nodes,
         ExitError("when allocating memory for the nodes vector", 13);
     if (( (*allsuccessors) = (unsigned long*)malloc((*ntotnsucc) * sizeof(unsigned long))) == NULL)
         ExitError("when allocating memory for the edges vector", 15);
+    if (( nameslen = (int*)malloc((*nnodes) * sizeof(int))) == NULL ) 
+        ExitError("when allocating memory for len of names", 13);
+    
     
     fprintf(stderr, "from bin:nnodes : %lu\nallsucc : %lu\n", *nnodes, *ntotnsucc);
 
-    /* Reading all data from file */
-    /* unsigned long nodesread = fread((*nodes), sizeof(node), (*nnodes), fin); */
-    /* if ( nodesread != (*nnodes) ) */
-    /*     fprintf(stderr, "nodes read : %lu\n", nodesread); */
-    /*     fprintf(stderr, "node 0. Nsucc: %d  \n", (*nodes)[0].nsucc); */
-    /*     fprintf(stderr, "node 1. Nsucc : %d \n", (*nodes)[1].nsucc); */
     if ( fread( (*nodes), sizeof(node), (*nnodes), fin) != (*nnodes))
         ExitError("when reading nodes from the binary data file", 17);
     if ( fread((*allsuccessors), sizeof(unsigned long), (*ntotnsucc), fin) !=
             (*ntotnsucc) )
         ExitError("when reading successors from the binary data file", 18);
+    
+    if( fread(nameslen,sizeof(int),(*nnodes),fin)!=(*nnodes))
+        ExitError("when reading lenth of names", 19);
+    for(i=0;i<(*nnodes);i++) {
+	if(nameslen[i]){
+	    if(((*nodes)[i].name=(char*)malloc(nameslen[i]+1))==NULL) ExitError("reserving a name",22);
+	    if (fread((*nodes)[i].name,sizeof(char),nameslen[i],fin)!=nameslen[i]) ExitError("reading names",23);
+	    strcat((*nodes)[i].name,"\0");
+	}
+     }
+
     fclose(fin);
 
     /* Setting pointers to successors */
-    for (i = 0; i < (*nnodes); i++) if((*nodes)[i].nsucc) {
+    for (i = 0; i < (*nnodes); i++) { //i'm using this loop, so the one extra in write is compensated
+      if((*nodes)[i].nsucc) {
         (*nodes)[i].successors = *allsuccessors; 
 	*allsuccessors += (*nodes)[i].nsucc;
+      }
     }
-
+   free(nameslen); nameslen=NULL;
     fprintf(stderr, "readBin(): end\n");
 }

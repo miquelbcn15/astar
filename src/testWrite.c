@@ -7,7 +7,7 @@
 
 /*
  * To compile:
-    gcc -o testw -g -Wall testMain.c readCvs.c auxFun.c
+    gcc -o testw -g -Wall testMain.c readCvs.c auxFun.c writebin.c
  * Exemple of execution:
     ./test cataluna.csv
  */
@@ -59,6 +59,6 @@ nodes=NULL;
     printf("FIRST name: %s \n", nodes[644].name); //should print La Roca. For control.
     printf("last node. Nsucc: %d \n", nodes[nnodes-1].nsucc);
 /* cleaning: eliminates flags from valgrind so we can see actual problems*/
-
+  //erased by accident. Fuck
     return 0; 
 }

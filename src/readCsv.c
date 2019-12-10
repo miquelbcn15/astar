@@ -10,12 +10,11 @@ void readFirst(char *name, unsigned long *nnodes, unsigned long *nways) {
     /* Initializing just in case */
     (*nnodes) = 0; (*nways) = 0;     
     FILE *fin;
-    int i, j;
+    int i;
 
     char   *buffer = NULL;
     size_t bufsize = 0;
     char *r = "r";       /* relation */
-    char *delim = "|";
     
     /* Open the file */
     if ((fin = fopen(name, "r")) == NULL) {
@@ -144,10 +143,10 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
         /* Save the name */
         token = strsep(&line2, delim);
         if(strlen(token) == 0) {
-            //(*nodes)[i].name = NULL; //EN VEZ DE NULL, NO TOCAR
+            (*nodes)[i].name = NULL; //EN VEZ DE NULL, NO TOCAR__version [187]
         } 
         else {
-            //(*nodes)[i].name = (char*)malloc(strlen(token)+1);  //OJO NO RESERVO MEMORIA NOMBRES
+            (*nodes)[i].name = (char*)malloc(strlen(token)+1);  //OJO NO RESERVO MEMORIA NOMBRES
             strcpy((*nodes)[i].name, token); //token does not have the null terminator (i think) but strcpy adds one, so reserve space for it
         }
         /* Skip useless information */
@@ -166,7 +165,7 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
     /* Allocate memory for additional sucessors */
     if ( (nsuccdim = (int*)calloc(nnodes, sizeof(int))) == NULL) {
         ExitError("allocating memory for nsuccdim", 13);
-    } /*we need it initialized to 0, and calloc is faster than malloc+memset*\
+    } //we need it initialized to 0, and calloc is faster than malloc+memset
 
     /* Read ways */
     for (i = 0; i < nways; i++) {
