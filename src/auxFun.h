@@ -30,4 +30,5 @@ typedef struct List {
 
 void ExitError(char*, int); 
 long binarySearch(node*, unsigned long, unsigned long);
+void clean(int **);
 #endif /* _AUXFUN_H */

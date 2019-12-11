@@ -23,6 +23,6 @@ long binarySearch(node *nodes, unsigned long key, unsigned long nnodes) {
 
 /*---------------------------------------------------------*/
 
-void clean(void ** v){
- free(*v); v=NULL; 
+void clean(int ** v) {
+    free(*v); v=NULL; 
 }

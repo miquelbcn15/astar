@@ -2,15 +2,15 @@
 OPT = -g -Wall
 
 # Tot:
-all : write read
+all : write # read
 
 # Utilitats:
 #  - Write the binary file
 write : testWrite.c writebin.o auxFun.o readCsv.o writebin.h readCsv.h auxFun.h
 	gcc -o write $(OPT) testWrite.c writebin.o readCsv.o auxFun.o
 # - Read the binary file
-read : testRead.c writebin.o auxFun.o writebin.h auxFun.h
-	gcc -o read $(OPT) testRead.c writebin.o auxFun.o
+# read : testRead.c writebin.o auxFun.o writebin.h auxFun.h
+# 	gcc -o read $(OPT) testRead.c writebin.o auxFun.o
 
 # Biblioteca
 auxFun.o: auxFun.c auxFun.h

@@ -60,7 +60,9 @@ void createEdge(node **nodes, unsigned long node1, unsigned long node2,
     for (i = 0; i < (oneway+1); i++) { 
         (*nodes)[s].nsucc++;
         if (nsuccdim[s] < (*nodes)[s].nsucc) { 
-            if (((*nodes)[s].successors = (unsigned long*)realloc((*nodes)[s].successors, (nsuccdim[s]+2) * sizeof(unsigned long))) == NULL) {
+            if (((*nodes)[s].successors = 
+                        (unsigned long*)realloc((*nodes)[s].successors, 
+                            (nsuccdim[s]+2) * sizeof(unsigned long))) == NULL) {
                 ExitError("reserving space for children", 27);
             }
             nsuccdim[s]+=2;
@@ -115,30 +117,25 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
 
         /* This has to be done somewhere, and here is recorring nodes anyway */
         (*nodes)[i].nsucc = 0;
-	(*nodes)[i].successors=NULL;
-        /* Trying to allocate memory before reallocating ... */
-        /* if ( ((*nodes)[i].successors = malloc(2 * sizeof(unsigned long))) == NULL) { */
-        /*     ExitError("allocating memory for successors", 13); */
-        /* } */
-
+	    (*nodes)[i].successors=NULL;
         /* Skip line type */
         strsep(&line2, delim);
         /* Save the id */
         token = strsep(&line2, delim);
-        (*nodes)[i].id=strtoul(token, &ptr, 10);
+        (*nodes)[i].id = strtoul(token, &ptr, 10);
         /* Save the name */
         token = strsep(&line2, delim);
         if(strlen(token) == 0) {
             (*nodes)[i].name = NULL; //EN VEZ DE NULL, NO TOCAR__version [187]
         } 
         else {
-            (*nodes)[i].name = (char*)malloc(strlen(token)+1);  //OJO NO RESERVO MEMORIA NOMBRES
+            (*nodes)[i].name = (char*)malloc(strlen(token) + 1);  
             strcpy((*nodes)[i].name, token); //token does not have the null terminator (i think) but strcpy adds one, so reserve space for it
         }
         /* Skip useless information */
         for (j = 4; j < 10; j++) strsep(&line2, delim);
         /* Save lat and lon */
-        (*nodes)[i].lat=strtod(line2, NULL);
+        (*nodes)[i].lat = strtod(line2, NULL);
         strsep(&line2,delim);
         (*nodes)[i].lon=strtod(line2, NULL);   
     }
@@ -156,7 +153,7 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
     /* Read ways */
     for (i = 0; i < nways; i++) {
         /* True means go and back */
-        oneway=1;  
+        oneway = 1;  
         /* Read first line */
         if (getline(&buffer, &bufsize, fin) == -1) {
             ExitError("when reading file", 2);

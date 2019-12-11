@@ -36,12 +36,28 @@ void writeBin(char *file, node *nodes, unsigned long nnodes) {
                     nodes[i].nsucc, fin) != nodes[i].nsucc ) 
             ExitError("when writing edges to the output binary data file", 32);
     }
-    for (i=0;i<nnodes;i++){ //i'm doing the loop twice-> one: store the lenth, two:store the names
-	if(nodes[i].name!=NULL) {len=strlen(nodes[i].name); if(fwrite(&len, sizeof(int), 1, fin) != 1) ExitError("writting len names",5);}
-        else {len=0; if(fwrite(&len, sizeof(int), 1, fin)!=1) ExitError("writting len names",5);}
+
+    /* Writing the names: first the lengths of each name */
+    for (i = 0; i < nnodes; i++) { 
+        /* doing the loop twice-> one: store the lenth, two:store the names */
+	    if ( nodes[i].name != NULL ) {
+            len = strlen(nodes[i].name);
+            if ( fwrite(&len, sizeof(int), 1, fin) != 1 ) 
+                ExitError("writting len names",5);
+        }
+        else {
+            len=0; 
+            if ( fwrite(&len, sizeof(int), 1, fin) != 1) 
+                ExitError("writting len names",5);
+        }
     }
-    for (i=0;i<nnodes;i++){ //this loop could use the lenth found before, but we would need to store them
-	if(nodes[i].name!=NULL) {len=strlen(nodes[i].name); if(fwrite(nodes[i].name, sizeof(char),len, fin) != len) ExitError("writting names",6);}
+    /* Writing the names: each name */
+    for (i = 0; i < nnodes; i++) {
+        /* this loop could use the length found before, but we would need to store them */
+        if ( nodes[i].name != NULL ) {
+            len = strlen(nodes[i].name); 
+            if ( fwrite(nodes[i].name, sizeof(char),len, fin) != len ) 
+                ExitError("writting names",6);}
     }    
     
     fclose(fin);
@@ -77,36 +93,51 @@ void readBin(char *name, node **nodes,
     
     
     fprintf(stderr, "from bin:nnodes : %lu\nallsucc : %lu\n", *nnodes, *ntotnsucc);
-
+    
+    /* Reading the nodes and successors */
     if ( fread( (*nodes), sizeof(node), (*nnodes), fin) != (*nnodes))
         ExitError("when reading nodes from the binary data file", 17);
     if ( fread((*allsuccessors), sizeof(unsigned long), (*ntotnsucc), fin) !=
             (*ntotnsucc) )
         ExitError("when reading successors from the binary data file", 18);
     
-    if( fread(nameslen,sizeof(int),(*nnodes),fin)!=(*nnodes))
+    /* Reading names length */
+    if( fread(nameslen, sizeof(int), (*nnodes),fin) != (*nnodes))
         ExitError("when reading lenth of names", 19);
-    for(i=0;i<(*nnodes);i++) {
-      len=nameslen[i]; /*No need to access the vector a thousand times in the loop*/
-	if(len){
-	    if(((*nodes)[i].name=(char*)malloc(len+1))==NULL) ExitError("when reserving memory for a name",22);
-	    ((*nodes)[i].name)[len]='\0';
-	    if (fread((*nodes)[i].name,sizeof(char),len,fin)!=len) ExitError("when reading a name",23);
-	} /*READ THIS: Valgrind doesn't like passing to fread an unitialized pointer although it's writing in it, not reading.
-	A solution is to put any value in the array. As the \0 is needed anyway, I put it at the end before fread.
-	Valgrind shuts up and everything works fine*/
-	else (*nodes)[i].name=NULL; /*READ:this null is to be sure, and will be useful reconstructing the final path*/
+
+    for( i = 0; i < (*nnodes); i++) {
+        len = nameslen[i]; 
+        /*No need to access the vector a thousand times in the loop*/
+	    if ( len ) {
+	        if ( ((*nodes)[i].name = (char*)malloc(len+1)) == NULL )
+                ExitError("when reserving memory for a name",22);
+	        ((*nodes)[i].name)[len]='\0';
+	        if ( fread((*nodes)[i].name, sizeof(char), len, fin) != len)
+                ExitError("when reading a name",23);
+	    } 
+        /*
+         * READ THIS: 
+         * Valgrind doesn't like passing to fread an unitialized pointer 
+         * although it's writing in it, not reading.
+	     * A solution is to put any value in the array. 
+         * As the \0 is needed anyway, I put it at the end before fread.
+	     * Valgrind shuts up and everything works fine
+         */
+	    else (*nodes)[i].name = NULL; 
+        /* READ:this null is to be sure, and will be useful reconstructing the final path */
      }
 
     fclose(fin);
 
     /* Setting pointers to successors */
-    for (i = 0; i < (*nnodes); i++) { //i'm using this loop, so the one extra in write is compensated
-      if((*nodes)[i].nsucc) {
-        (*nodes)[i].successors = *allsuccessors; 
-	*allsuccessors += (*nodes)[i].nsucc;
+    for (i = 0; i < (*nnodes); i++) { 
+        /* i'm using this loop, so the one extra in write is compensated */
+        if ( (*nodes)[i].nsucc ) {
+            (*nodes)[i].successors = *allsuccessors; 
+	        *allsuccessors += (*nodes)[i].nsucc;
       }
     }
-   clean(&nameslen);
+
+    clean(&nameslen);
     fprintf(stderr, "readBin(): end\n");
 }
