@@ -58,9 +58,9 @@ int main(int argc, char *argv[]){
     nodes=NULL;
     
     /* Reading the written file */
-    unsigned long *allsuccessors;
-    unsigned long numnodos, numtotnsucc;
-    readBin("cataluna.bin", &nodes, &allsuccessors, &numnodos, &numtotnsucc);
+    /* unsigned long *allsuccessors; */
+    /* unsigned long numnodos, numtotnsucc; */
+    /* readBin("cataluna.bin", &nodes, &allsuccessors, &numnodos, &numtotnsucc); */
     /* printf("node 0. Nsucc: %d , succ %lu\n", nodes[0].nsucc, nodes[0].successors[0]); */
     /* printf("FIRST name: %s \n", nodes[644].name); //should print La Roca. For control. */
     /* printf("last node. Nsucc: %d \n", nodes[nnodes-1].nsucc); */

@@ -26,9 +26,12 @@ typedef struct List {
     struct List *next;
 } list;
 
+/* heuristic function */
+typedef double (*heur)(node u, node s);
+
 #define infinity 1e6 //we need something bigger than the biggest value
 
 void ExitError(char*, int); 
 long binarySearch(node*, unsigned long, unsigned long);
-void clean(int **);
+/* void clean(int **); */
 #endif /* _AUXFUN_H */
