@@ -20,32 +20,27 @@ void cleanList(list *start){
     aux=aux->next;
     while(aux!=NULL) {
       aux2=aux->next;
-      aux->vertex=NULL;
-      aux->status=NULL;
       free(aux);
       aux=aux2;
     }
-    start->vertex=NULL;
-    start->status=NULL;
     free(start); // start=NULL;  /*maybe i want to conserve the pointer declared*/
 }
 
 /*----------------------------------------------------------------*/
 
-void push(list **start, node *put, AStarStatus*stat){ //at the start
+void push(list **start, unsigned long ind){ //at the start
    list* aux;
    aux=(*start);
    if( ((*start)=(list*)malloc(sizeof(list)))==NULL ) ExitError("allocating memory for list element",25);  
-   (**start).vertex=put;
-   (**start).status=stat;
+   (**start).index=ind;
    (**start).next=aux;
 }
 
 /*----------------------------------------------------------------*/
 
-list* pop(list **start){ //NO MEMORY IS FREED IN THIS FUNCTION BECAUSE THE ELEMENT IS RETURNED
+list* pop(list **start){ //MEMORY IS NOT FREED IN THIS FUNCTION
  if((*start)==NULL){
-  printf("Null queue to extract from\n"); exit(0); 
+  printf("Null queue to extract from. Check for errors, I'm stopping\n"); exit(0); 
  }
  if((*start)->next==NULL){
   list* this;
@@ -75,10 +70,9 @@ list* pop(list **start){ //NO MEMORY IS FREED IN THIS FUNCTION BECAUSE THE ELEME
   printf("\n No node with a min distance. Can this actually happen in A*?\n");
   return NULL;
  }
- list *this;
+ list* this;
  this=parent; //the element i want
  aux=parent->next; //reuse the variable, is what i need to link afterwards
- 
  if(prev==NULL){ //if the extracted is the first element
    (*start)=aux;
  }
@@ -95,22 +89,17 @@ void computeF(list *link, AStarStatus stat){ //so we can add complicated things 
 
 /*---------------------------------------------------------------*/
 
-int Astar(node* nodes, unsigned long nnodes, unsigned long source, unsigned long dest ){ //source and dest are expected to be id
+unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes, unsigned long source, unsigned long dest,heur h){ //source and dest are expected to be id
   unsigned long i;
   /*identification of source and destination*/
   unsigned long s,g;
   s=binarySearch(nodes, source, nnodes);
   g=binarySearch(nodes, dest, nnodes); /*now s and g are the indices of source and goal*/
   
-  /*creation of the array of status*/
-  AStarStatus *allstatus;
-  if( (allstatus=(AStarStatus*)malloc(nnodes*sizeof(AStarStatus)))==NULL) ExitError("when allocating memory for status",24);
-      /*we need all nodes to have a status entry, to know at least if they are open, closed or none*/
-  
   /*creating the open list and adding the source node*/
   list *start;
   start=NULL;
-  push(&start,nodes+s,allstatus+s);
+  push(&start,s);
   
   /*initializing the values of the source node*/
   allstatus[s].g=0; allstatus[s].h=h(nodes[s],nodes[g]); computeF(start, allstatus[s]); allstatus[s].parent=ULONG_MAX;
@@ -122,51 +111,84 @@ int Astar(node* nodes, unsigned long nnodes, unsigned long source, unsigned long
   allstatus[s].where=OPEN;
   
   /*declaring auxiliar variables needed in the loop*/
-  list *u; //i'll be extracting the pointer to the list element
+  list* u; //i'll be extracting an element from the list
   double newDist; 
   double prevF=0; //to check if the heuristic is monotone
   unsigned long v; //the index of an adjacent node
-  
+  int monotone=1;
   /*main loop*/
   while (start!=NULL){
       u=pop(&start);
       if(u==NULL) ExitError("something went very wrong popping a node",26);
       /*checking monotonicity*/
-      if (u->f<prevF) printf("Detected node where heuristic not monotone!\n");
+      if (u->f<prevF) monotone=0;
       prevF=u->f;
-      
       /*checking ending of the function*/
-      if(u->vertex->id==dest) break; //maybe a return here
+      if(u->index==g){printf("done!\n"); break;} //maybe a return here
       
       /*loop through all successors of the popped node*/
-      for (i=0;i<u->vertex->nsucc;i++){
-	  v=u->vertex->successors[i];
-	  newDist=u->status->g+w(*(u->vertex),nodes[v]);
+      for (i=0;i<nodes[u->index].nsucc;i++){
+	  v=nodes[u->index].successors[i];
+	  newDist=allstatus[u->index].g+w(nodes[u->index],nodes[v]);
 	  
 	  /*which list is v in? act in consequence*/
-	  if (allstatus[v].where==OPEN)
-	      if (allstatus[v].g<newDist) continue; //READ THIS:valgrind not gonna like this, because g is not initialized. But if it's not, node is not open and this if is not checked. So, do we initialize g to infinity?
+	  if (allstatus[v].where==OPEN){
+	      if (allstatus[v].g<newDist) continue;} //READ THIS:valgrind not gonna like this, because g is not initialized. But if it's not, node is not open and this if is not checked. So, do we initialize g to infinity?
 	  else if (allstatus[v].where==CLOSED){
 	      if (allstatus[v].g<newDist) continue; //same here
-	      push(&start, nodes+v,allstatus+v);
+	      push(&start, v);
 	      allstatus[v].where=OPEN;
 	  }
 	  else{
-	      push(&start, nodes+v,allstatus+v);
+	      push(&start, v);
 	      allstatus[v].where=OPEN;
-	      h(nodes[v],nodes[g]); 
+	      allstatus[v].h=h(nodes[v],nodes[g]); 
 	  }
 	  allstatus[v].g=newDist;
-	  allstatus[v].parent=binarySearch(nodes, u->vertex->id, nnodes);
+	  allstatus[v].parent=u->index;
 	  computeF(start,allstatus[v]);
       }
-      u->status->where=CLOSED;   
+      allstatus[u->index].where=CLOSED;  
+      free(u); u=NULL; //the list elemement popped now is cleaned
   }
-  
-  if(u->vertex->id!=dest)  printf("the list was empty, something went wrong\n");
-  else printf("done!\n");
- return 0; 
+ if(u==NULL) {printf("something was wrong\n"); cleanList(start); return -1;}
+ cleanList(start);
+ if(monotone) printf("heuristic is monotone\n"); else printf("nope, heuristic is not monotone\n");
+ return u->index; 
 }
+
+/*--------------------------------------------------------------*/
+
+void readList(list *start,node*nodes){
+ list *aux;
+ aux=start;
+ while(aux!=NULL){
+  printf("now you are in %lu",nodes[aux->index].id);
+  if(nodes[aux->index].name!=NULL) printf(" called %s",nodes[aux->index].name);
+  printf("\n");
+  aux=(*aux).next;
+ }
+}
+
+void showPath(node* nodes, AStarStatus* stats, int goal){
+ printf("Total distance: %f\n",stats[goal].g);
+ unsigned long i;
+ i=goal;
+ list* start;
+ start=(list*)malloc(sizeof(list));start=NULL;
+ push(&start, i);
+ i=stats[i].parent;
+ while(i!=ULONG_MAX){
+   push(&start,i);
+   i=stats[i].parent;
+ }
+ printf("Route:\n");
+ readList(start,nodes);
+ printf("You have reached your destination\n");
+ cleanList(start);
+}
+
+
 
 
 

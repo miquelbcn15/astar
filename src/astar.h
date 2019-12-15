@@ -2,5 +2,7 @@
 #define _ASTAR_H
 
 #include "auxFun.h"
-int Astar(node* nodes, unsigned long nnodes, unsigned long source, unsigned long dest );
+unsigned long Astar(node* nodes, AStarStatus *allstatus,unsigned long nnodes, unsigned long source, unsigned long dest,heur h);
+void readList(list *start,node*nodes);
+void showPath(node* nodes, AStarStatus* stats, int goal);
 #endif

@@ -21,14 +21,15 @@ typedef struct {
 
 typedef struct List {
     double f;
-    node *vertex;
-    AStarStatus *status;
+    unsigned long index;
     struct List *next;
 } list;
 
 /* heuristic function */
 typedef double (*heur)(node u, node s);
-
+double h1(node source, node dest);
+double h2(node source, node dest);
+double h3(node source, node dest);
 #define infinity 1e6 //we need something bigger than the biggest value
 
 void ExitError(char*, int); 

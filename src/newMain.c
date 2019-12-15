@@ -30,12 +30,14 @@ int main(int argc, char *argv[]){
    unsigned long nnodes, numtotnsucc;
    readBin("cataluna.bin", &nodes, &allsuccessors, &nnodes, &numtotnsucc);
       /* Control prints, just in case something explodes*/
-      printf("node 0. Nsucc: %d , succ %lu\n", nodes[0].nsucc, nodes[0].successors[0]);
+     /* printf("node 0. Nsucc: %d , succ %lu\n", nodes[0].nsucc, nodes[0].successors[0]);
       printf("FIRST name: %s \n", nodes[644].name); //should print La Roca. For control.
-      printf("last node. Nsucc: %d \n", nodes[nnodes-1].nsucc);
-      
-   Astar(nodes,nnodes, 8670491, 8670492);
-    
+      printf("last node. Nsucc: %d \n", nodes[nnodes-1].nsucc); */
+  unsigned long goal;
+  AStarStatus *allstatus;
+  if( (allstatus=(AStarStatus*)malloc(nnodes*sizeof(AStarStatus)))==NULL) ExitError("when allocating memory for status",24);
+  goal=Astar(nodes,allstatus, nnodes,771979683,429854583,h1);
+  showPath(nodes, allstatus,goal);
     
     
     
@@ -46,11 +48,12 @@ int main(int argc, char *argv[]){
 /* cleaning: eliminates flags from valgrind so we can see actual problems*/
 int done=0;
   for (i=0;i<nnodes;i++){
-      if(nodes[i].nsucc>0 && !done) {clean(&nodes[i].successors); done=1;} 
+      if(nodes[i].nsucc>0 && !done) {free(nodes[i].successors); done=1;} 
       /*READ THIS: allsuccessors pointer is corrupted. The first time a set of successors was asigned we "create" a copy
        * of the pointer to the first position. So doing free of that pointer, frees allsuccessors vector*/
-      if(nodes[i].name!=NULL) clean(&nodes[i].name); 
+      if(nodes[i].name!=NULL) free(nodes[i].name); 
   }    
-  clean(&nodes);
+  free(nodes);
+  free(allstatus);
   return 0; 
 }

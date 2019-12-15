@@ -92,7 +92,7 @@ void readBin(char *name, node **nodes,
         ExitError("when allocating memory for len of names", 13);
     
     
-    fprintf(stderr, "from bin:nnodes : %lu\nallsucc : %lu\n", *nnodes, *ntotnsucc);
+//    fprintf(stderr, "from bin:nnodes : %lu\nallsucc : %lu\n", *nnodes, *ntotnsucc);
     
     /* Reading the nodes and successors */
     if ( fread( (*nodes), sizeof(node), (*nnodes), fin) != (*nnodes))
