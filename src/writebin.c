@@ -24,7 +24,7 @@ void writeBin(char *file, node *nodes, unsigned long nnodes) {
     if ( fwrite(&nnodes, sizeof(unsigned long), 1, fin) +
          fwrite(&ntotnsucc, sizeof(unsigned long), 1, fin) != 2 )
         ExitError("when initializing the output binary data file", 32);
-    fprintf(stderr, "to bin: nnodes : %lu\nallsucc : %lu\n", nnodes, ntotnsucc);
+    fprintf(stderr, "writeBin(): to bin, nnodes : %lu\tallsucc : %lu\n", nnodes, ntotnsucc);
 
     /* Writing all nodes */
     if ( fwrite(nodes, sizeof(node), nnodes, fin) != nnodes) 
@@ -138,6 +138,7 @@ void readBin(char *name, node **nodes,
       }
     }
 
-    clean(&nameslen);
+    /* clean(&nameslen); */
+    free(nameslen); nameslen = NULL;
     fprintf(stderr, "readBin(): end\n");
 }
