@@ -23,7 +23,7 @@ void cleanList(list *start){
       free(aux);
       aux=aux2;
     }
-    free(start); // start=NULL;  /*maybe i want to conserve the pointer declared*/
+    free(start); start=NULL;  /*maybe i want to conserve the pointer declared*/
 }
 
 /*----------------------------------------------------------------*/
@@ -154,7 +154,9 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes, unsigned l
  if(u==NULL) {printf("something was wrong\n"); cleanList(start); return -1;}
  cleanList(start);
  if(monotone) printf("heuristic is monotone\n"); else printf("nope, heuristic is not monotone\n");
- return u->index; 
+ v=u->index; //reusing variable unsigned long to store the index i want to return
+ free(u); u=NULL;
+ return v; 
 }
 
 /*--------------------------------------------------------------*/
@@ -163,8 +165,8 @@ void readList(list *start,node*nodes){
  list *aux;
  aux=start;
  while(aux!=NULL){
-  printf("now you are in %lu",nodes[aux->index].id);
-  if(nodes[aux->index].name!=NULL) printf(" called %s",nodes[aux->index].name);
+  printf("%lu|%f|%f",nodes[aux->index].id,nodes[aux->index].lat,nodes[aux->index].lon);
+ // if(nodes[aux->index].name!=NULL) printf(" called %s",nodes[aux->index].name);
   printf("\n");
   aux=(*aux).next;
  }
@@ -174,8 +176,7 @@ void showPath(node* nodes, AStarStatus* stats, int goal){
  printf("Total distance: %f\n",stats[goal].g);
  unsigned long i;
  i=goal;
- list* start;
- start=(list*)malloc(sizeof(list));start=NULL;
+ list* start;start=NULL;
  push(&start, i);
  i=stats[i].parent;
  while(i!=ULONG_MAX){
@@ -184,7 +185,7 @@ void showPath(node* nodes, AStarStatus* stats, int goal){
  }
  printf("Route:\n");
  readList(start,nodes);
- printf("You have reached your destination\n");
+ //printf("You have reached your destination\n");
  cleanList(start);
 }
 
