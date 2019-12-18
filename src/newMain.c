@@ -8,7 +8,7 @@
 
 /*
  * To compile:
-    gcc -o as -g -Wall newMain.c auxFun.c writebin.c astar.c
+    gcc -o as -g -Wall newMain.c auxFun.c writebin.c astar.c -lm
  * Exemple of execution:
     ./test cataluna.bin
  */
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]){
    unsigned long i;
    unsigned long *allsuccessors;
    unsigned long nnodes, numtotnsucc;
-   readBin("cataluna.bin", &nodes, &allsuccessors, &nnodes, &numtotnsucc);
+   readBin("cat.bin", &nodes, &allsuccessors, &nnodes, &numtotnsucc);
    /* readBin("spain.bin", &nodes, &allsuccessors, &nnodes, &numtotnsucc); */
       /* Control prints, just in case something explodes*/
      /* printf("node 0. Nsucc: %d , succ %lu\n", nodes[0].nsucc, nodes[0].successors[0]);
@@ -37,8 +37,10 @@ int main(int argc, char *argv[]){
   unsigned long goal;
   AStarStatus *allstatus;
   if( (allstatus=(AStarStatus*)malloc(nnodes*sizeof(AStarStatus)))==NULL) ExitError("when allocating memory for status",24);
-  goal=Astar(nodes,allstatus, nnodes,771979683,429854583,h1);
-  /* goal=Astar(nodes,allstatus, nnodes,240949599,195977239,h1); */
+  //goal=Astar(nodes,allstatus, nnodes,8670491,8670492,h1); //cataluna.bin
+
+     goal=Astar(nodes,allstatus, nnodes,771979683,429854583,h3); //cataluna.bin
+  /* goal=Astar(nodes,allstatus, nnodes,240949599,195977239,h1); */   //spain.bin
   showPath(nodes, allstatus,goal);
     
     

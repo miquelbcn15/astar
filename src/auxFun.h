@@ -3,7 +3,7 @@
 
 #define R 6378137        /* earth radius in meters */ 
 #define PI 3.14159265359 
-
+#define infinity 1e6 //we need something bigger than the biggest value
 typedef struct {
     unsigned long id;
     char* name;
@@ -33,7 +33,7 @@ typedef double (*heur)(node u, node s);
 double h1(node source, node dest);
 double h2(node source, node dest);
 double h3(node source, node dest);
-#define infinity 1e6 //we need something bigger than the biggest value
+
 
 void ExitError(char*, int); 
 long binarySearch(node*, unsigned long, unsigned long);

@@ -5,13 +5,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-double w(node u, node v){ //to test compilation
-    /* double a = PI/180 * sqrt((u.lat-v.lat)*(u.lat-v.lat)+(u.lon-v.lon)*(u.lon-v.lon)); */
-    return h3(u,v); // lo se, esta feo
-}
-
-double h(node u, node s){ //to test compilation
-    return sqrt((u.lat-s.lat)*(u.lat-s.lat)+(u.lon-s.lon)*(u.lon-s.lon));
+double w(node u, node v){ //to test compilation  
+    double lat1 = PI/180 *u.lat , lon1 = PI/180 *u.lon;
+    double lat2 = PI/180 *v.lat ,   lon2 = PI/180 *v.lon;
+    double d_lon = fabs(lon1 - lon2); 
+    double d_lat = fabs(lat1 - lat2); 
+    double x = d_lon * cos((lat1 + lat2)/2);
+    return R * sqrt(x*x + d_lat*d_lat);
 }
 
 /*----------------------------------------------------------------*/
@@ -25,8 +25,7 @@ void cleanList(list *start){
       free(aux);
       aux=aux2;
     }
-    free(start); start=NULL;  /*maybe i want to conserve the pointer declared*/
-}
+    free(start); start=NULL;  }
 
 /*----------------------------------------------------------------*/
 
@@ -112,7 +111,7 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes, unsigned l
     allstatus[i].where=NONE; 
   }
   allstatus[s].where=OPEN;
-  
+  printf("#heuristic distance to goal from source: %f\n",h(nodes[s],nodes[g]));
   /*declaring auxiliar variables needed in the loop*/
   list* u; //i'll be extracting an element from the list
   double newDist; 
@@ -122,23 +121,26 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes, unsigned l
   /*main loop*/
   while (start!=NULL){
       u=pop(&start);
+      printf("%lu|%f|%f\n",nodes[u->index].id,nodes[u->index].lat,nodes[u->index].lon);
+//      printf("popped g=%f,h=%f,f=%f\n",allstatus[u->index].g,allstatus[u->index].h,u->f);
       if(u==NULL) ExitError("something went very wrong popping a node",26);
       /*checking monotonicity*/
       if (u->f<prevF) monotone=0;
       prevF=u->f;
       /*checking ending of the function*/
-      if(u->index==g){printf("done!\n"); break;} //maybe a return here
+      if(u->index==g){printf("#done!\n"); break;} //maybe a return here
       
       /*loop through all successors of the popped node*/
+     // printf("-----\n");
       for (i=0;i<nodes[u->index].nsucc;i++){
 	  v=nodes[u->index].successors[i];
 	  newDist=allstatus[u->index].g+w(nodes[u->index],nodes[v]);
 	  
 	  /*which list is v in? act in consequence*/
 	  if (allstatus[v].where==OPEN){
-	      if (allstatus[v].g<newDist) continue;} //READ THIS:valgrind not gonna like this, because g is not initialized. But if it's not, node is not open and this if is not checked. So, do we initialize g to infinity?
+	      if (allstatus[v].g<newDist) continue;} 
 	  else if (allstatus[v].where==CLOSED){
-	      if (allstatus[v].g<newDist) continue; //same here
+	      if (allstatus[v].g<newDist) continue; 
 	      push(&start, v);
 	      allstatus[v].where=OPEN;
 	  }
@@ -156,7 +158,7 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes, unsigned l
   }
  if(u==NULL) {printf("something was wrong\n"); cleanList(start); return -1;}
  cleanList(start);
- if(monotone) printf("heuristic is monotone\n"); else printf("nope, heuristic is not monotone\n");
+ if(monotone) printf("#heuristic is monotone\n"); else printf("#nope, heuristic is not monotone\n");
  v=u->index; //reusing variable unsigned long to store the index i want to return
  free(u); u=NULL;
  return v; 
@@ -176,7 +178,7 @@ void readList(list *start,node*nodes){
 }
 
 void showPath(node* nodes, AStarStatus* stats, int goal){
- printf("Total distance: %f\n",stats[goal].g);
+ printf("#Total distance: %f m\n",stats[goal].g);
  unsigned long i;
  i=goal;
  list* start;start=NULL;
@@ -186,7 +188,7 @@ void showPath(node* nodes, AStarStatus* stats, int goal){
    push(&start,i);
    i=stats[i].parent;
  }
- printf("Route:\n");
+ printf("#Route:\n");
  readList(start,nodes);
  //printf("You have reached your destination\n");
  cleanList(start);
