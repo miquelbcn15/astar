@@ -1,6 +1,9 @@
 #ifndef _AUXFUN_H
 #define _AUXFUN_H
 
+#define R 6378137        /* earth radius in meters */ 
+#define PI 3.14159265359 
+
 typedef struct {
     unsigned long id;
     char* name;

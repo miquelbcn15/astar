@@ -3,6 +3,7 @@
 !*/
 !*/Makefile
 *.csv
+*.html
 *.o
 *.bin
 *.swp

@@ -1,11 +1,13 @@
 #include "auxFun.h"
+#include <float.h>
 #include <math.h>
 #include <limits.h> //for the ulongmax
 #include <stdlib.h>
 #include <stdio.h>
 
 double w(node u, node v){ //to test compilation
-    return sqrt((u.lat-v.lat)*(u.lat-v.lat)+(u.lon-v.lon)*(u.lon-v.lon));
+    /* double a = PI/180 * sqrt((u.lat-v.lat)*(u.lat-v.lat)+(u.lon-v.lon)*(u.lon-v.lon)); */
+    return h3(u,v); // lo se, esta feo
 }
 
 double h(node u, node s){ //to test compilation
@@ -91,6 +93,7 @@ void computeF(list *link, AStarStatus stat){ //so we can add complicated things 
 
 unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes, unsigned long source, unsigned long dest,heur h){ //source and dest are expected to be id
   unsigned long i;
+  /* for (i=0; i < nnodes; i++) allstatus[i].g = DBL_MAX; */
   /*identification of source and destination*/
   unsigned long s,g;
   s=binarySearch(nodes, source, nnodes);

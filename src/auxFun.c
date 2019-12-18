@@ -2,9 +2,7 @@
 #include "auxFun.h"
 #include <stdlib.h>
 #include <math.h>
-
-#define PI 3.14159265359 
-#define R 6378137        /* earth radius in meters */ 
+#include "auxFun.h"
 
 void ExitError(char* miss, int errcode) {
   fprintf (stderr, "\nERROR: %s.\nStopping...\n\n", miss); exit(errcode);
@@ -62,5 +60,5 @@ double h3(node source, node dest) {
 /* void clean(int ** v) { */
 /*     free(*v); v=NULL; */ 
 /* } */
-#undef PI
-#undef R
+//#undef PI
+// #undef R
