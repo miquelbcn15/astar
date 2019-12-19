@@ -121,7 +121,7 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes, unsigned l
   /*main loop*/
   while (start!=NULL){
       u=pop(&start);
-      printf("%lu|%f|%f\n",nodes[u->index].id,nodes[u->index].lat,nodes[u->index].lon);
+//      printf("%lu|%f|%f\n",nodes[u->index].id,nodes[u->index].lat,nodes[u->index].lon);
 //      printf("popped g=%f,h=%f,f=%f\n",allstatus[u->index].g,allstatus[u->index].h,u->f);
       if(u==NULL) ExitError("something went very wrong popping a node",26);
       /*checking monotonicity*/
@@ -134,7 +134,9 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes, unsigned l
      // printf("-----\n");
       for (i=0;i<nodes[u->index].nsucc;i++){
 	  v=nodes[u->index].successors[i];
-	  newDist=allstatus[u->index].g+w(nodes[u->index],nodes[v]);
+          double we=w(nodes[u->index],nodes[v]);
+	  if(!we) continue; 
+	  newDist=allstatus[u->index].g+we;
 	  
 	  /*which list is v in? act in consequence*/
 	  if (allstatus[v].where==OPEN){
