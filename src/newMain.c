@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include "readCsv.h"
 #include "writebin.h"
 #include "auxFun.h"
@@ -13,40 +14,38 @@
     ./test cataluna.bin
  */
 
-
-
 int main(int argc, char *argv[]){
-#define NOMF argv[1]
-#define NARGS 2
-//     if (argc<NARGS
-//        ) {
-//         fprintf(stderr,"%s file\n", argv[0]);
-//         return -1;
-//     }
-
    node *nodes;
    unsigned long i;
    unsigned long *allsuccessors;
    unsigned long nnodes, numtotnsucc;
-   readBin("cat.bin", &nodes, &allsuccessors, &nnodes, &numtotnsucc);
-   /* readBin("spain.bin", &nodes, &allsuccessors, &nnodes, &numtotnsucc); */
-      /* Control prints, just in case something explodes*/
-     /* printf("node 0. Nsucc: %d , succ %lu\n", nodes[0].nsucc, nodes[0].successors[0]);
-      printf("FIRST name: %s \n", nodes[644].name); //should print La Roca. For control.
-      printf("last node. Nsucc: %d \n", nodes[nnodes-1].nsucc); */
-  unsigned long goal;
+   
+#define NOMF argv[1]
+#define NARGS 2
+    if (argc<NARGS
+       ) {
+        fprintf(stderr,"%s file\n", argv[0]);
+        return -1;
+    }
+    
+    /* Reading the file */
+    fprintf(stderr, "Reading the file ... \n");
+    clock_t time_readA = clock();
+    readBin(NOMF, &nodes, &allsuccessors, &nnodes, &numtotnsucc);
+    clock_t time_readB = clock();
+    fprintf(stderr, "Reading time : %lf \n",
+            (double)(time_readB - time_readA)/CLOCKS_PER_SEC);
+                
+  unsigned long goal, source, result;
   AStarStatus *allstatus;
   if( (allstatus=(AStarStatus*)malloc(nnodes*sizeof(AStarStatus)))==NULL) ExitError("when allocating memory for status",24);
   //goal=Astar(nodes,allstatus, nnodes,8670491,8670492,h1); //cataluna.bin
-
-     goal=Astar(nodes,allstatus, nnodes,771979683,429854583,h3); //cataluna.bin
-  /* goal=Astar(nodes,allstatus, nnodes,240949599,195977239,h1); */   //spain.bin
-  showPath(nodes, allstatus,goal);
-    
-    
-    
-    
-    
+  clock_t time_A = clock();
+     // goal=Astar(nodes,allstatus, nnodes, 771979683, 429854583, h3); //cataluna.bin
+  goal=Astar(nodes,allstatus, nnodes,240949599,195977239,h1);   //spain.bin
+  time_A = clock() - time_A;
+  showPath(nodes, allstatus, goal);
+  fprintf(stderr, "time a star: %f\n", (double)time_A/CLOCKS_PER_SEC);
     
     
 /* cleaning: eliminates flags from valgrind so we can see actual problems*/
