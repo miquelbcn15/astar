@@ -4,6 +4,12 @@
 #include <limits.h> /* for the ulongmax */
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
+double weight  = .5;
+double epsilon = .0; 
+
+#define N 65535
 
 double w(node u, node v){   
     double lat1 = PI/180. *u.lat , lon1 = PI/180. *u.lon;
@@ -16,9 +22,9 @@ double w(node u, node v){
 
 /*----------------------------------------------------------------*/
 
-void computeF(list *link, AStarStatus stat) { 
-    /* so we can add complicated things later */
-    link->f = stat.g + stat.h; 
+void computeF(list *link, AStarStatus stat, unsigned short depth) {
+    link->f = (1. - weight) * stat.g + weight * stat.h * 
+              (1. + epsilon * (1. - depth/N));
 }
 
 /*----------------------------------------------------------------*/
@@ -37,14 +43,15 @@ void cleanList(list *start) {
 
 /*----------------------------------------------------------------*/
 
-void push(list** start, unsigned long ind, AStarStatus stat, node* nodes) {
+void push(list** start, unsigned long ind, AStarStatus stat, node* nodes,
+        unsigned short* depth) {
     /* pushing the element ind sorted*/
     list* element;
 
     if ( (element = (list*)malloc(sizeof(list))) == NULL) 
         ExitError("allocating memory for list element", 25);
     element->index = ind;
-    computeF(element, stat);
+    computeF(element, stat, depth[ind]);
     nodes[ind].lista = element;
     
     if ( (*start) == NULL ) {   /* the list is empty */
@@ -132,6 +139,13 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
         unsigned long source, unsigned long dest, heur h) { 
     /* source and dest are expected to be id */
     unsigned long i;
+    fprintf(stderr, "Astar(): init\n");
+
+    unsigned short *depth;
+    if ( (depth = (unsigned short*)malloc(nnodes * sizeof(unsigned short)))
+            == NULL) 
+        ExitError("when allocating memory depth", 25);
+    memset(depth, USHRT_MAX, nnodes * sizeof(unsigned short));
 
     /* for (i=0; i < nnodes; i++) allstatus[i].g = DBL_MAX; */
     /* identification of source and destination */
@@ -145,9 +159,10 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
     /* now s and g are the indices of source and goal */
 
     /* initializing the values of the source node */
-    allstatus[s].g = 0; 
-    allstatus[s].h = h(nodes[s], nodes[g]); 
+    allstatus[s].g      = 0; 
+    allstatus[s].h      = h(nodes[s], nodes[g]); 
     allstatus[s].parent = ULONG_MAX;
+    depth[s]            = 0U;
 
     /* locating all nodes in a list, all nodes element list set to NULL */
     for ( i = 0; i < nnodes; i++) { /* this has to be done. Anything to reuse the loop? */
@@ -159,9 +174,9 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
     /* creating the open list and adding the source node */
     list *start;
     start = NULL;
-    push(&start, s, allstatus[s], nodes);
+    push(&start, s, allstatus[s], nodes, depth);
 
-    fprintf(stderr, "Astar(): heuristic distance to goal from source: %f\n", 
+    fprintf(stdout, "# Heuristic distance to goal from source: %f\n", 
             h(nodes[s], nodes[g]));
 
     /*declaring auxiliar variables needed in the loop*/
@@ -183,7 +198,7 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
         prevF = u->f;
         
         /*checking ending of the function*/
-        if( u->index == g ) { fprintf(stderr, "Astar(): done!\n"); break; } 
+        if( u->index == g ) { fprintf(stderr, "Astar(): done"); break; } 
         /* maybe a return here */
 
         /* loop through all successors of the popped node */
@@ -191,6 +206,7 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
         for ( i = 0; i < nodes[u->index].nsucc; i++ ) {
             v = nodes[u->index].successors[i];
             z = nodes[v].lista;  /* element of the list */
+            if (depth[v] == SHRT_MAX) depth[v] = depth[u->index] + 1; 
             
             double we = w(nodes[u->index], nodes[v]);
             if ( !we ) continue; 
@@ -212,7 +228,7 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
             }
             allstatus[v].g      = newDist;
             allstatus[v].parent = u->index;
-            push(&start, v, allstatus[v], nodes);
+            push(&start, v, allstatus[v], nodes, depth);
         }
         allstatus[u->index].where = CLOSED;  
         free(u); u = NULL; /* the list elemement popped now is cleaned */
@@ -230,7 +246,18 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
     v = u->index; 
     /* reusing variable unsigned long to store the index i want to return */
     free(u); u = NULL;
+    fprintf(stderr, "Astar(): done\n");
     return v; 
+}
+
+/*--------------------------------------------------------------*/
+void push_start(list **start, unsigned long ind) {
+    list *aux;
+    aux=(*start);
+    if ( ((*start) = (list*)malloc(sizeof(list))) == NULL) 
+        ExitError("allocating memory for list element", 25);
+    (**start).index = ind;
+    (**start).next  = aux;
 }
 
 /*--------------------------------------------------------------*/
@@ -259,10 +286,10 @@ void showPath(node *nodes, AStarStatus *stats, int goal) {
     unsigned long i;
     i = goal;
     list* start; start = NULL;
-    push(&start, i, stats[i], nodes);
+    push_start(&start, i);
     i = stats[i].parent;
     while ( i != ULONG_MAX){
-        push(&start,i, stats[i], nodes);
+        push_start(&start,i);
         i = stats[i].parent;
     }
     fprintf(stdout, "# Route:\n");
@@ -270,12 +297,4 @@ void showPath(node *nodes, AStarStatus *stats, int goal) {
     cleanList(start);
 }
 
-
-
-
-
-
-
-
-
-
+#undef N

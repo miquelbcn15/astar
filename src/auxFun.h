@@ -32,6 +32,7 @@ typedef struct {
 
 /* heuristic function */
 typedef double (*heur)(node u, node s);
+double h0(node source, node dest);
 double h1(node source, node dest);
 double h2(node source, node dest);
 double h3(node source, node dest);

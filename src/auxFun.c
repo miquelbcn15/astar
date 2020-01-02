@@ -26,6 +26,11 @@ long binarySearch(node *nodes, unsigned long key, unsigned long nnodes) {
 /*---------------------------------------------------------*/
 
 /* heuristic functions */
+double h0(node source, node dest) {
+    /* dijkstra */
+    return 0;
+}
+
 double h1(node source, node dest) {
     /* haversine */
     double lat1 = source.lat * PI / 180., lon1 = source.lon * PI / 180.;

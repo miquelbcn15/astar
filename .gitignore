@@ -7,5 +7,5 @@
 *.o
 *.bin
 *.swp
-*.txt
-*.sol
+src/*.txt
+src/*.sol

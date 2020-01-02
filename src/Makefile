@@ -8,8 +8,8 @@ all : write astar
 #  - Write the binary file
 write : write.c writebin.c auxFun.c readCsv.c writebin.h readCsv.h auxFun.h
 	gcc -o write $(OPT) write.c writebin.c readCsv.c auxFun.c -lm
-astar: newMain.c astar.c astar.h writebin.c writebin.h auxFun.c auxFun.h
-	gcc -o astar $(OPT) newMain.c astar.c writebin.c auxFun.c -lm
+astar: main.c astar.c astar.h writebin.c writebin.h auxFun.c auxFun.h
+	gcc -o astar $(OPT) main.c astar.c writebin.c auxFun.c -lm
 
 # - Read the binary file
 # read : testRead.c writebin.o auxFun.o writebin.h auxFun.h
@@ -25,7 +25,7 @@ astar: newMain.c astar.c astar.h writebin.c writebin.h auxFun.c auxFun.h
 
 # Neteja
 clean : 
-	rm -f *.o *.html *.txt *.data
+	rm -f *.o *.html *.data
 realclean : clean
 	rm -f write astar
 
