@@ -75,11 +75,11 @@ void readBin(char *name, node **nodes,
     fprintf(stderr, "readBin(): init\n");
     FILE *fin;
 
-    if ((fin = fopen (name, "rb")) == NULL) 
+    if ( (fin = fopen (name, "rb")) == NULL) 
         ExitError("the data file does not exist or cannot be opened", 11);
 
     /* Global data --- header */
-    if (fread(nnodes, sizeof(unsigned long), 1, fin) +\
+    if ( fread(nnodes, sizeof(unsigned long), 1, fin) +\
         fread(ntotnsucc, sizeof(unsigned long), 1, fin) != 2 )
         ExitError("when reading the header of the binary data file", 12);
 
@@ -91,9 +91,6 @@ void readBin(char *name, node **nodes,
     if (( nameslen = (int*)malloc((*nnodes) * sizeof(int))) == NULL ) 
         ExitError("when allocating memory for len of names", 13);
     
-    
-//    fprintf(stderr, "from bin:nnodes : %lu\nallsucc : %lu\n", *nnodes, *ntotnsucc);
-    
     /* Reading the nodes and successors */
     if ( fread( (*nodes), sizeof(node), (*nnodes), fin) != (*nnodes))
         ExitError("when reading nodes from the binary data file", 17);
@@ -102,10 +99,10 @@ void readBin(char *name, node **nodes,
         ExitError("when reading successors from the binary data file", 18);
     
     /* Reading names length */
-    if( fread(nameslen, sizeof(int), (*nnodes),fin) != (*nnodes))
+    if ( fread(nameslen, sizeof(int), (*nnodes),fin) != (*nnodes))
         ExitError("when reading lenth of names", 19);
 
-    for( i = 0; i < (*nnodes); i++) {
+    for ( i = 0; i < (*nnodes); i++) {
         len = nameslen[i]; 
         /*No need to access the vector a thousand times in the loop*/
 	    if ( len ) {

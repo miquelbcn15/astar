@@ -1,6 +1,6 @@
-# Reading time : 1.357325 
+# Reading time : 1.433417 
 # Heuristic distance to goal from source: 831622.884101
-# Time astar: 0.543915
+# Time astar: 0.577571
 # Total distance: 1089515.588423 m
 # Route:
 # Optimal path found

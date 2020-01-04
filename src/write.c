@@ -8,9 +8,9 @@
 
 /*
  * To compile:
-    gcc -o testw -g -Wall testMain.c readCvs.c auxFun.c writebin.c
+    gcc -o write -g -Wall write.c readCsv.c auxFun.c writebin.c
  * Exemple of execution:
-    ./test cataluna.csv
+    ./write cataluna.csv
  */
 
 int main(int argc, char *argv[]){

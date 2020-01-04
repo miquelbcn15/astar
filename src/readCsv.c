@@ -126,11 +126,15 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
         /* Save the name */
         token = strsep(&line2, delim);
         if(strlen(token) == 0) {
-            (*nodes)[i].name = NULL; //EN VEZ DE NULL, NO TOCAR__version [187]
+            (*nodes)[i].name = NULL; 
         } 
         else {
             (*nodes)[i].name = (char*)malloc(strlen(token) + 1);  
-            strcpy((*nodes)[i].name, token); //token does not have the null terminator (i think) but strcpy adds one, so reserve space for it
+            strcpy((*nodes)[i].name, token); /* 
+                                              * token does not have the null terminator 
+                                              * (i think) but strcpy adds one, 
+                                              * so reserve space for it
+                                              */
         }
         /* Skip useless information */
         for (j = 4; j < 10; j++) strsep(&line2, delim);
@@ -165,7 +169,10 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
         
         /* Type of way */
         token = strsep(&line2, delim);
-        if (strlen(token) > 0) oneway = 0; // something written=>oneway, so its false
+        if (strlen(token) > 0) oneway = 0; /* 
+                                            * something written=>oneway, 
+                                            * so its false 
+                                            */
         
         /* line2 points to field 10, first node */  
         strsep(&line2, delim);  
@@ -185,8 +192,11 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
         while (token != NULL) { //while the chain of edges in this way
             node2 = binarySearch(*nodes, strtoul(token, &ptr, 10), nnodes);
             if ( node2 + 1 ) {
-               // >0 true. return -1=>false. 
-               // Node does not exist. Take another for node2. No node? Discard way
+               /* 
+                * >0 true. return -1=>false. 
+                * Node does not exist. Take another for node2. No node? Discard
+                * way 
+                */
                createEdge(nodes, node1, node2, oneway, nsuccdim);
                node1 = node2;
             }

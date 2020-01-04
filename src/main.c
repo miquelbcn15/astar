@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
          * h2 : spherical law
          * h3 : equirectangular
          */
-        result = Astar(nodes,allstatus, nnodes, source, goal, h0);
+        result = Astar(nodes,allstatus, nnodes, source, goal, h2);
         if ( nodes[result].id != goal) { 
             fprintf(stderr, "Path not found\n");
             break;

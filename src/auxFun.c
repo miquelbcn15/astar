@@ -48,7 +48,7 @@ double h2(node source, node dest) {
     double lat2 = dest.lat * PI / 180.,   lon2 = dest.lon * PI / 180.;
     double d_lon = fabs(lon1 - lon2);
     double a = sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(d_lon);
-    return a * R;
+    return acos(a) * R;
 }
 
 double h3(node source, node dest) {
@@ -60,10 +60,3 @@ double h3(node source, node dest) {
     double x = d_lon * cos((lat1 + lat2)/2.);
     return R * sqrt(x*x + d_lat*d_lat);
 }
-
-
-/* void clean(int ** v) { */
-/*     free(*v); v=NULL; */ 
-/* } */
-//#undef PI
-// #undef R

@@ -268,7 +268,7 @@ void readList(list *start, node *nodes, AStarStatus *stats) {
     fprintf(stdout, "# Optimal path found\n# Id | Distance | Name | Latitude |"
             " Longitude \n");
     while ( aux != NULL) {
-        fprintf(stdout, "Node id: %lu | Distance: %#.2f | Name: %s | %3.6f |"
+        fprintf(stdout, " %lu | %#.2f | %s | %3.6f |"
                 " %3.6f",
                 nodes[aux->index].id, stats[aux->index].g,
                 nodes[aux->index].name, nodes[aux->index].lat,

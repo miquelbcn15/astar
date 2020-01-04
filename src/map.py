@@ -7,7 +7,7 @@ import argparse
 import sys
 
 # setting the map(latitude, longitude, zoom)
-gmap = gmplot.GoogleMapPlotter(41.9333, 2.25, 8)
+gmap = gmplot.GoogleMapPlotter(39.4697495, -0.37739, 7)
 
 # input file
 in_file = sys.argv[1]
@@ -26,8 +26,8 @@ with open(in_file, 'r') as f:
         fields = line.split('|')
         for field in fields:
             field.strip();
-        latitude_list.append(float(fields[1]))
-        longitude_list.append(float(fields[2]))
+        latitude_list.append(float(fields[3]))
+        longitude_list.append(float(fields[4]))
 
 # Add the route
 gmap.plot(latitude_list, longitude_list, 'cornflowerblue', edge_width = 6)
