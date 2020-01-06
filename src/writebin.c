@@ -112,16 +112,7 @@ void readBin(char *name, node **nodes,
 	        if ( fread((*nodes)[i].name, sizeof(char), len, fin) != len)
                 ExitError("when reading a name",23);
 	    } 
-        /*
-         * READ THIS: 
-         * Valgrind doesn't like passing to fread an unitialized pointer 
-         * although it's writing in it, not reading.
-	     * A solution is to put any value in the array. 
-         * As the \0 is needed anyway, I put it at the end before fread.
-	     * Valgrind shuts up and everything works fine
-         */
 	    else (*nodes)[i].name = NULL; 
-        /* READ:this null is to be sure, and will be useful reconstructing the final path */
      }
 
     fclose(fin);
