@@ -73,7 +73,7 @@ int main(int argc, char *argv[]){
         showPath(nodes, allstatus, result);
     }
     
-    /* cleaning: eliminates flags from valgrind so we can see actual problems*/
+    /* cleaning*/
     int done=0;
     for ( i = 0; i < nnodes; i++) {
         if(nodes[i].nsucc > 0 && !done) { free(nodes[i].successors); done = 1;} 

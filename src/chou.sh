@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# An example session of how to execute the cose. 
+# An example session of how to execute the code. 
 # Requirement: spain.csv file
 
 make realclean

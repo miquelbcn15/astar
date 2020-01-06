@@ -3,7 +3,7 @@
 
 #define R 6378100        /* earth radius in meters */ 
 #define PI 3.14159265359 
-#define infinity 1e6     /* we need something bigger than the biggest value */
+#define infinity 1e6     /* something bigger than the biggest value */
 
 typedef char Queue;
 
@@ -40,4 +40,4 @@ double h3(node source, node dest);
 
 void ExitError(char*, int); 
 long binarySearch(node*, unsigned long, unsigned long);
-#endif /* _AUXFUN_H */
+#endif 

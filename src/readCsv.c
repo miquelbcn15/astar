@@ -115,7 +115,7 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
         }
         line2 = buffer;
 
-        /* This has to be done somewhere, and here is recorring nodes anyway */
+        /* Initialize number of successors */
         (*nodes)[i].nsucc = 0;
 	    (*nodes)[i].successors=NULL;
         /* Skip line type */
@@ -130,11 +130,8 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
         } 
         else {
             (*nodes)[i].name = (char*)malloc(strlen(token) + 1);  
-            strcpy((*nodes)[i].name, token); /* 
-                                              * token does not have the null terminator 
-                                              * (i think) but strcpy adds one, 
-                                              * so reserve space for it
-                                              */
+            strcpy((*nodes)[i].name, token); /*reserve space
+                                              *for null termnator*/                                           
         }
         /* Skip useless information */
         for (j = 4; j < 10; j++) strsep(&line2, delim);
@@ -156,7 +153,6 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
 
     /* Read ways */
     for (i = 0; i < nways; i++) {
-        /* True means go and back */
         oneway = 1;  
         /* Read first line */
         if (getline(&buffer, &bufsize, fin) == -1) {
@@ -182,8 +178,7 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
         token = strsep(&line2, delim); 
         /* 
          * edge 2 is in token. 
-         * If edge 2 does not exist, token=NULL, not while, 
-         * jump next i->way discarded: DONE
+         * If edge 2 does not exist, token=NULL, way discarded 
          */
         while (node1 < 0 && token != NULL) { //ghost first node
             node1 = binarySearch(*nodes, strtoul(token, &ptr, 10), nnodes);
@@ -192,11 +187,6 @@ void readNodes(char *name, node **nodes, unsigned long nnodes, unsigned long nwa
         while (token != NULL) { //while the chain of edges in this way
             node2 = binarySearch(*nodes, strtoul(token, &ptr, 10), nnodes);
             if ( node2 + 1 ) {
-               /* 
-                * >0 true. return -1=>false. 
-                * Node does not exist. Take another for node2. No node? Discard
-                * way 
-                */
                createEdge(nodes, node1, node2, oneway, nsuccdim);
                node1 = node2;
             }

@@ -24,8 +24,8 @@ long binarySearch(node *nodes, unsigned long key, unsigned long nnodes) {
 }
 
 /*---------------------------------------------------------*/
+/* HEURISTIC FUNCTIONS */
 
-/* heuristic functions */
 double h0(node source, node dest) {
     /* dijkstra */
     return 0;

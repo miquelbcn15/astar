@@ -53,7 +53,6 @@ void writeBin(char *file, node *nodes, unsigned long nnodes) {
     }
     /* Writing the names: each name */
     for (i = 0; i < nnodes; i++) {
-        /* this loop could use the length found before, but we would need to store them */
         if ( nodes[i].name != NULL ) {
             len = strlen(nodes[i].name); 
             if ( fwrite(nodes[i].name, sizeof(char),len, fin) != len ) 
@@ -103,8 +102,7 @@ void readBin(char *name, node **nodes,
         ExitError("when reading lenth of names", 19);
 
     for ( i = 0; i < (*nnodes); i++) {
-        len = nameslen[i]; 
-        /*No need to access the vector a thousand times in the loop*/
+        len = nameslen[i]; /*faster access*/
 	    if ( len ) {
 	        if ( ((*nodes)[i].name = (char*)malloc(len+1)) == NULL )
                 ExitError("when reserving memory for a name",22);
@@ -119,14 +117,12 @@ void readBin(char *name, node **nodes,
 
     /* Setting pointers to successors */
     for (i = 0; i < (*nnodes); i++) { 
-        /* i'm using this loop, so the one extra in write is compensated */
         if ( (*nodes)[i].nsucc ) {
             (*nodes)[i].successors = *allsuccessors; 
 	        *allsuccessors += (*nodes)[i].nsucc;
       }
     }
 
-    /* clean(&nameslen); */
     free(nameslen); nameslen = NULL;
     fprintf(stderr, "readBin(): end\n");
 }
