@@ -7,8 +7,7 @@ extern double weight, epsilon;
 
 double w(node u, node v);   
 void cleanList(list *start);
-void push(list** start, unsigned long ind, AStarStatus stat, node* nodes,
-        unsigned short* depth);
+void push(list** start, unsigned long ind, AStarStatus stat, node* nodes, unsigned short* depth);
 list* pop(list** start);
 void deleteElement (list** start, list** element);
 void computeF(list *link, AStarStatus stat, unsigned short depth);

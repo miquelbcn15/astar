@@ -66,7 +66,6 @@ void push(list** start, unsigned long ind, AStarStatus stat, node* nodes,
         while (aux != NULL) {
             if (element->f < aux->f) {
                 /* Insert node before aux and return */
-                /* sth happen here, */
                 element->next     = aux;
                 element->prev     = father;
                 aux->prev         = element;
@@ -147,7 +146,6 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
         ExitError("when allocating memory depth", 25);
     memset(depth, USHRT_MAX, nnodes * sizeof(unsigned short));
 
-    /* for (i=0; i < nnodes; i++) allstatus[i].g = DBL_MAX; */
     /* identification of source and destination */
     unsigned long s, g;
     s = binarySearch(nodes, source, nnodes);
@@ -165,7 +163,7 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
     depth[s]            = 0U;
 
     /* locating all nodes in a list, all nodes element list set to NULL */
-    for ( i = 0; i < nnodes; i++) { /* this has to be done. Anything to reuse the loop? */
+    for ( i = 0; i < nnodes; i++) { 
         allstatus[i].where = NONE;
         nodes[i].lista     = NULL; 
     }
@@ -180,7 +178,7 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
             h(nodes[s], nodes[g]));
 
     /*declaring auxiliar variables needed in the loop*/
-    list *u, *z;            /* i'll be extracting an element from the list */
+    list *u, *z;            /* an element from the list will be pop*/
     double newDist; 
     double prevF = 0;       /* to check if the heuristic is monotone */
     unsigned long v;        /* the index of an adjacent node */
@@ -199,17 +197,15 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
         
         /*checking ending of the function*/
         if( u->index == g ) { fprintf(stderr, "Astar(): done"); break; } 
-        /* maybe a return here */
 
         /* loop through all successors of the popped node */
-        // printf("-----\n");
         for ( i = 0; i < nodes[u->index].nsucc; i++ ) {
             v = nodes[u->index].successors[i];
             z = nodes[v].lista;  /* element of the list */
             if (depth[v] == SHRT_MAX) depth[v] = depth[u->index] + 1; 
             
             double we = w(nodes[u->index], nodes[v]);
-            if ( !we ) continue; 
+            if ( !we ) continue; /*for duplicated nodes*/
             newDist = allstatus[u->index].g + we;
 
             /* which list is v in? act in consequence */
@@ -231,10 +227,10 @@ unsigned long Astar(node* nodes, AStarStatus *allstatus, long nnodes,
             push(&start, v, allstatus[v], nodes, depth);
         }
         allstatus[u->index].where = CLOSED;  
-        free(u); u = NULL; /* the list elemement popped now is cleaned */
+        free(u); u = NULL;
     }
     if ( u== NULL ) { 
-        fprintf(stderr, "something was wrong\n"); 
+        fprintf(stderr, "Something was wrong during Astar\n"); 
         cleanList(start); 
         return -1;
     }
